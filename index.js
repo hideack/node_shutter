@@ -8,12 +8,19 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const crypto = require('crypto');
 
-const PORT = process.env.PORT || 5000
+const KEY=process.env.SHUTTER_KEY || 'sample-key';
+const PORT = process.env.PORT || 5000;
 
 // Declare a route
 fastify.get('/', function (request, reply) {
+
+  // Check key
+  if (request.query.key != KEY) {
+    reply.status(401).send("Unauthorized");
+    return;
+  }
+
   (async () => {
-    // request.query.section
     const url = request.query.url;
     const sha1 = crypto.createHash('sha1')
     const fileName = `screenshots/${sha1.update(url).digest('hex')}.png`;
