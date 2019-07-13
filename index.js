@@ -9,7 +9,7 @@ const crypto = require('crypto');
 const moment = require('moment');
 
 // Env
-const KEY=process.env.SHUTTER_KEY || 'sample-key';
+const KEY=process.env.KEY || 'sample-key';
 const PORT = process.env.PORT || 5000;
 const EXPIRE = process.env.EXPIRE || 5;
 
