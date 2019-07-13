@@ -1,4 +1,3 @@
-
 // Require the framework and instantiate it
 const fastify = require('fastify')({
   logger: true
@@ -7,12 +6,15 @@ const fastify = require('fastify')({
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const crypto = require('crypto');
+const moment = require('moment');
 
+// Env
 const KEY=process.env.SHUTTER_KEY || 'sample-key';
 const PORT = process.env.PORT || 5000;
+const EXPIRE = process.env.EXPIRE || 5;
 
 // Declare a route
-fastify.get('/', function (request, reply) {
+fastify.get('/', (request, reply) => {
 
   // Check key
   if (request.query.key != KEY) {
@@ -29,7 +31,13 @@ fastify.get('/', function (request, reply) {
   let hitCache = true;
 
   try {
-    fs.statSync(fileName);
+    let cacheStatus = fs.statSync(fileName);
+    let minAgo = moment().diff(moment(cacheStatus.ctime)) / (1000 * 60);
+
+    if (EXPIRE < minAgo) {
+      hitCache = false;
+      request.log.info("Cache expire!!");
+    }
   } catch(e) {
     hitCache = false;
   }
@@ -64,15 +72,15 @@ fastify.get('/', function (request, reply) {
   })();
 });
 
-fastify.get('/ping', function (request, reply) {
+fastify.get('/ping', (request, reply) => {
   reply.send({"ping":"pong"});
 });
 
 // Run the server!
-fastify.listen(PORT, '0.0.0.0', function (err, address) {
+fastify.listen(PORT, '0.0.0.0', (err, address) => {
   if (err) {
-    fastify.log.error(err)
-    process.exit(1)
+    fastify.log.error(err);
+    process.exit(1);
   }
-  fastify.log.info(`server listening on ${address}`)
+  fastify.log.info(`server listening on ${address}`);
 })
