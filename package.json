@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/hideack/shutter#readme",
   "dependencies": {
-    "fastify": "^2.6.0"
+    "fastify": "^2.6.0",
+    "puppeteer": "^1.18.1"
   }
 }
