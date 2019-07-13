@@ -20,31 +20,41 @@ fastify.get('/', function (request, reply) {
     return;
   }
 
+  const url = request.query.url;
+  const sha1 = crypto.createHash('sha1')
+  const fileName = `screenshots/${sha1.update(url).digest('hex')}.png`;
+
+  request.log.info(`Save screenshot : ${fileName}`)
+
+  let hitCache = true;
+
+  try {
+    fs.statSync(fileName);
+  } catch(e) {
+    hitCache = false;
+  }
+
   (async () => {
-    const url = request.query.url;
-    const sha1 = crypto.createHash('sha1')
-    const fileName = `screenshots/${sha1.update(url).digest('hex')}.png`;
-
-    request.log.info(`Save screenshot : ${fileName}`)
-
     try {
-      await fs.statSync(fileName);
-      request.log.info(`Cache hit! : ${fileName}`)
-    } catch (e) {
-      const browser = await puppeteer.launch({
-        timeout: 60000,
-        args: [
-          '--enable-font-antialiasing',
-          '--no-sandbox',
-          '--disable-setuid-sandbox'
-        ]
-      });
-      const page = await browser.newPage();
-      page.setViewport({width: 1280, height: 1280});
+      if (!hitCache) {
+        const browser = await puppeteer.launch({
+          timeout: 60000,
+          args: [
+            '--enable-font-antialiasing',
+            '--no-sandbox',
+            '--disable-setuid-sandbox'
+          ]
+        });
+        const page = await browser.newPage();
+        page.setViewport({width: 1280, height: 1280});
 
-      await page.goto(url);
-      await page.screenshot({path: fileName});
-      await browser.close();
+        await page.goto(url);
+        await page.screenshot({path: fileName});
+        await browser.close();
+      }
+    } catch(e) {
+      reply.status(500).send(e);
+      return;
     }
 
     await fs.readFile(fileName, (err, data) => {
