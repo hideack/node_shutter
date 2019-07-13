@@ -5,6 +5,7 @@ const fastify = require('fastify')({
 })
 
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 
 const PORT = process.env.PORT || 5000
 
@@ -24,9 +25,11 @@ fastify.get('/', function (request, reply) {
     await page.screenshot({path: 'example.png'});
     await browser.close();
 
-  })();
+    fs.readFile('example.png', (err, data) => {
+      reply.header('Content-Type', 'image/png').header('Content-Length', data.length).send(data);
+    });
 
-  reply.send({"status":"done"});
+  })();
 });
 
 fastify.get('/ping', function (request, reply) {
