@@ -12,7 +12,13 @@ const PORT = process.env.PORT || 5000
 fastify.get('/', function (request, reply) {
   (async () => {
     const url = 'https://www.remp.jp/hello';
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      args: [
+        '--enable-font-antialiasing',
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
+      ]
+    });
     const page = await browser.newPage();
     await page.goto(url);
     await page.screenshot({path: 'example.png'});
