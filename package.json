@@ -1,0 +1,19 @@
+{
+  "name": "shutter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hideack/shutter.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hideack/shutter/issues"
+  },
+  "homepage": "https://github.com/hideack/shutter#readme"
+}
