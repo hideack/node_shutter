@@ -21,6 +21,7 @@
     "crypto": "^1.0.1",
     "fastify": "^2.6.0",
     "fs": "0.0.1-security",
+    "moment": "^2.24.0",
     "puppeteer": "^1.18.1"
   }
 }
