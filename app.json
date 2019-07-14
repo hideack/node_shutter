@@ -1,0 +1,25 @@
+{
+  "name": "Shutter",
+  "description": "Sceenshot API",
+  "repository": "https://github.com/hideack/shutter",
+  "keywords": ["puppeteer"],
+  "env": {
+    "KEY": {
+      "description": "A secret key.",
+      "generator": "secret"
+    },
+    "EXPIRE": {
+      "description": "Screen shot cache expire. (min)",
+      "value": "1440"
+    }
+  },
+  "image": "heroku/nodejs",
+  "buildpacks": [
+      {
+        "url": "https://github.com/CoffeeAndCode/puppeteer-heroku-buildpack.git"
+      },
+      {
+        "url": "heroku/nodejs"
+      }
+  ]
+}
