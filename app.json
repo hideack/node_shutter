@@ -4,10 +4,6 @@
   "repository": "https://github.com/hideack/shutter",
   "keywords": ["puppeteer"],
   "env": {
-    "KEY": {
-      "description": "A secret key.",
-      "generator": "secret"
-    },
     "EXPIRE": {
       "description": "Screen shot cache expire. (min)",
       "value": "1440"
