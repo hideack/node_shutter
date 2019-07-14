@@ -26,3 +26,5 @@ http://localhost:5000/?key=sample-key&url=https://github.com/hideack/shutter
 - KEY : スクリーンショットリクエスト呼び出し制御用のキー (デフォルト: sample-key)
 - EXPIRE: ファイルキャッシュ期限 (デフォルト:5分)
  
+## heroku
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/hideack/shutter)
