@@ -26,6 +26,12 @@ fastify.get('/', (request, reply) => {
   const sha1 = crypto.createHash('sha1')
   const fileName = `screenshots/${sha1.update(url).digest('hex')}.png`;
 
+  // Check scheme
+  if (url.match(/^http.+$/) === null) {
+    reply.status(400).send("Bad scheme");
+    return;
+  }
+
   request.log.info(`Save screenshot : ${fileName}`)
 
   let hitCache = true;
