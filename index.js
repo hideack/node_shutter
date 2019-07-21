@@ -45,6 +45,10 @@ fastify.get('/', (request, reply) => {
   (async () => {
     try {
       if (!hitCache) {
+        await fs.readFile("no-image.png", (err, data) => {
+          reply.header('Content-Type', 'image/png').header('Content-Length', data.length).send(data);
+        });
+
         const browser = await puppeteer.launch({
           timeout: 60000,
           args: [
@@ -56,19 +60,22 @@ fastify.get('/', (request, reply) => {
         const page = await browser.newPage();
         page.setViewport({width: 1280, height: 1280});
 
+        request.log.info("Start take a capture.");
+
         await page.goto(url);
         await page.screenshot({path: fileName});
         await browser.close();
+
+        request.log.info("Finish take a capture.");
+      } else {
+        await fs.readFile(fileName, (err, data) => {
+          reply.header('Content-Type', 'image/png').header('Content-Length', data.length).send(data);
+        });
       }
     } catch(e) {
       reply.status(500).send(e);
       return;
     }
-
-    await fs.readFile(fileName, (err, data) => {
-      reply.header('Content-Type', 'image/png').header('Content-Length', data.length).send(data);
-    });
-
   })();
 });
 
