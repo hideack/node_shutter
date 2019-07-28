@@ -27,4 +27,4 @@ http://localhost:5000/?key=sample-key&url=https://github.com/hideack/shutter
 - EXPIRE: ファイルキャッシュ期限 (デフォルト:5分)
  
 ## heroku
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/hideack/shutter)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/hideack/shutter) [![Greenkeeper badge](https://badges.greenkeeper.io/hideack/shutter.svg)](https://greenkeeper.io/)
