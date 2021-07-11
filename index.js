@@ -23,8 +23,10 @@ fastify.get('/', (request, reply) => {
   }
 
   const url = request.query.url;
-  const sha1 = crypto.createHash('sha1')
-  const fileName = `screenshots/${sha1.update(url).digest('hex')}.png`;
+  const sha1 = crypto.createHash('sha1');
+  const hash = sha1.update(url).digest('hex');
+  const fileName = `screenshots/${hash}.png`;
+  const newerFileName = `screenshots/new-${hash}.png`;
 
   // Check scheme
   if (url.match(/^http.+$/) === null) {
@@ -51,10 +53,6 @@ fastify.get('/', (request, reply) => {
   (async () => {
     try {
       if (!hitCache) {
-        await fs.readFile("no-image.png", (err, data) => {
-          reply.header('Content-Type', 'image/png').header('Content-Length', data.length).send(data);
-        });
-
         const browser = await puppeteer.launch({
           timeout: 60000,
           args: [
@@ -69,10 +67,17 @@ fastify.get('/', (request, reply) => {
         request.log.info("Start take a capture.");
 
         await page.goto(url);
-        await page.screenshot({path: fileName});
+        await page.screenshot({path: newerFileName});
         await browser.close();
 
         request.log.info("Finish take a capture.");
+
+        fs.rename(newerFileName, fileName, err=> {
+          fs.readFile(fileName, (err, data) => {
+            reply.header('Content-Type', 'image/png').header('Content-Length', data.length).send(data);
+          });
+        });
+
       } else {
         await fs.readFile(fileName, (err, data) => {
           reply.header('Content-Type', 'image/png').header('Content-Length', data.length).send(data);
