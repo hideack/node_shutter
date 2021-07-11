@@ -22,6 +22,7 @@
     "fastify": "^3.19.0",
     "fs": "0.0.1-security",
     "moment": "^2.29.1",
+    "pixelmatch": "^5.2.1",
     "puppeteer": "^10.1.0"
   }
 }
