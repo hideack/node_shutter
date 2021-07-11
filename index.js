@@ -7,6 +7,8 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const crypto = require('crypto');
 const moment = require('moment');
+const pixelmatch = require('pixelmatch');
+const png = require('pngjs').PNG;
 
 // Env
 const KEY=process.env.KEY || 'sample-key';
@@ -23,8 +25,11 @@ fastify.get('/', (request, reply) => {
   }
 
   const url = request.query.url;
-  const sha1 = crypto.createHash('sha1')
-  const fileName = `screenshots/${sha1.update(url).digest('hex')}.png`;
+  const sha1 = crypto.createHash('sha1');
+  const hash = sha1.update(url).digest('hex');
+  const fileName = `screenshots/${hash}.png`;
+  const newerFileName = `screenshots/new-${hash}.png`;
+  const diffFileName = `screenshots/diff-${hash}.png`;
 
   // Check scheme
   if (url.match(/^http.+$/) === null) {
@@ -48,13 +53,13 @@ fastify.get('/', (request, reply) => {
     hitCache = false;
   }
 
+  if (request.query.force == "true") {
+    hitCache = false;
+  }
+
   (async () => {
     try {
       if (!hitCache) {
-        await fs.readFile("no-image.png", (err, data) => {
-          reply.header('Content-Type', 'image/png').header('Content-Length', data.length).send(data);
-        });
-
         const browser = await puppeteer.launch({
           timeout: 60000,
           args: [
@@ -69,10 +74,33 @@ fastify.get('/', (request, reply) => {
         request.log.info("Start take a capture.");
 
         await page.goto(url);
-        await page.screenshot({path: fileName});
+        await page.screenshot({path: newerFileName});
         await browser.close();
 
         request.log.info("Finish take a capture.");
+
+        let responseTargetFileName = fileName;
+
+        if (request.query.diff == "true") {
+          try {
+            const img1 = png.sync.read(fs.readFileSync(newerFileName));
+            const img2 = png.sync.read(fs.readFileSync(fileName));
+            const {width, height} = img1;
+            const diff = new png({width, height});
+
+            await pixelmatch(img1.data, img2.data, diff.data, width, height, {threshold: 0.1});
+            await fs.writeFileSync(diffFileName, png.sync.write(diff));
+
+            responseTargetFileName = diffFileName;
+          } catch(e) {
+          }
+        }
+
+        fs.rename(newerFileName, fileName, err=> {
+          fs.readFile(responseTargetFileName, (err, data) => {
+            reply.header('Content-Type', 'image/png').header('Content-Length', data.length).send(data);
+          });
+        });
       } else {
         await fs.readFile(fileName, (err, data) => {
           reply.header('Content-Type', 'image/png').header('Content-Length', data.length).send(data);
