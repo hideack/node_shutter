@@ -102,7 +102,15 @@ fastify.get('/', (request, reply) => {
           });
         });
       } else {
-        await fs.readFile(fileName, (err, data) => {
+        let responseTargetFileName;
+
+        if (request.query.diff == "true") {
+          responseTargetFileName = diffFileName;
+        } else {
+          responseTargetFileName = fileName;
+        }
+
+        await fs.readFile(responseTargetFileName, (err, data) => {
           reply.header('Content-Type', 'image/png').header('Content-Length', data.length).send(data);
         });
       }
